@@ -13,13 +13,13 @@ func TestParse(t *testing.T) {
         "State": {
             "Status": "running",
             "Running": true,
-            "Paused": false,
+            "Paused": false
         }
      }`
 
 	_, err := Parse([]byte(validJson))
 	if err != nil {
-		t.Errorf("Expected to parse content without error. Got %v instead.", err)
+		t.Errorf("Expected to parse content without error. Got \"%v\" instead.", err)
 	}
 
 	validJson = `{
