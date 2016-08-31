@@ -56,3 +56,28 @@ func TestGet(t *testing.T) {
 		t.Errorf("Expected nil for a non existing field")
 	}
 }
+
+func TestGetNestedFields(t *testing.T) {
+	validJson := `{
+        "Id": "d836a5e40aa8974d7076e791ba3c14726bf2dd2cd079652477d6827973969130",
+        "Created": "2016-08-31T16:49:33.119587574Z",
+        "Path": "/bin/bash",
+        "Args": [],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false,
+            "Log": {
+                "Level": "Warn"
+            }
+        }
+     }`
+
+	v, _ := Parse([]byte(validJson))
+	key := "State.Log.Level"
+	expectedV := v.(map[string]interface{})["State"].(map[string]interface{})["Log"].(map[string]interface{})["Level"]
+	returnedV := Get(key, v)
+	if !reflect.DeepEqual(expectedV, returnedV) {
+		t.Errorf("Expected %v: Got %v", expectedV, returnedV)
+	}
+}
