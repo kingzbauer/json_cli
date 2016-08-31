@@ -51,4 +51,8 @@ func TestGet(t *testing.T) {
 	if !reflect.DeepEqual(expectedV, returnedV) {
 		t.Errorf("Expected: %v, Got: %v", expectedV, returnedV)
 	}
+
+	if Get("States", v) != nil {
+		t.Errorf("Expected nil for a non existing field")
+	}
 }
