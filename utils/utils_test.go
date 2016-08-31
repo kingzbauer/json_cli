@@ -80,4 +80,8 @@ func TestGetNestedFields(t *testing.T) {
 	if !reflect.DeepEqual(expectedV, returnedV) {
 		t.Errorf("Expected %v: Got %v", expectedV, returnedV)
 	}
+
+	if Get("State.Log.Nonexisting", v) != nil {
+		t.Error("Expected a nil result")
+	}
 }
