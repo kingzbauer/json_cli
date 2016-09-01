@@ -6,6 +6,8 @@ import (
 	"io/ioutil"
 	"os"
 
+	"bytes"
+	"encoding/json"
 	"github.com/kingzbauer/json_cli/utils"
 )
 
@@ -55,5 +57,17 @@ func main() {
 		fmt.Println(err)
 		os.Exit(1)
 	}
-	fmt.Println(utils.Get(*key, v))
+	result := utils.Get(*key, v)
+
+	// if result is among any of the concrete types, print as is
+	switch t := result.(type) {
+	case float64, bool, string, nil:
+		fmt.Println(t)
+	default:
+		// format output for non concrete types
+		buffer := new(bytes.Buffer)
+		resultBytes, _ := json.Marshal(result)
+		json.Indent(buffer, resultBytes, "", "  ")
+		fmt.Println(buffer.String())
+	}
 }
