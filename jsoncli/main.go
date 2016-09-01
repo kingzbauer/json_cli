@@ -1,20 +1,27 @@
 package main
 
 import (
+	"bytes"
+	"encoding/json"
 	"flag"
 	"fmt"
 	"io/ioutil"
 	"os"
+	"strings"
 
-	"bytes"
-	"encoding/json"
 	"github.com/kingzbauer/json_cli/utils"
 )
 
 var (
-	key  = flag.String("k", "", "The key value for the field you want to access. Separate nested keys using `.`")
-	file = flag.String("f", "", "Json file to search")
+	key       = flag.String("k", "", "The key value for the field you want to access. Separate nested keys using `.`")
+	file      = flag.String("f", "", "Json file to search")
+	indent    = flag.Int("indent", 4, "Indent level for the json output")
+	indentStr = flag.String("indentStr", " ", "String used to indent")
 )
+
+func getIndentString(indentLevel int, indentStr string) string {
+	return strings.Repeat(indentStr, indentLevel)
+}
 
 func main() {
 	flag.Parse()
@@ -24,6 +31,7 @@ func main() {
 		os.Exit(1)
 	}
 
+	// TODO: put into own function
 	var (
 		content []byte
 		err     error
@@ -37,6 +45,7 @@ func main() {
 	} else {
 		// try reading from Stdin
 		stat, _ := os.Stdin.Stat()
+		// Check if input is being piped in
 		if (stat.Mode() & os.ModeCharDevice) == 0 {
 			content, err = ioutil.ReadAll(os.Stdin)
 			if err != nil {
@@ -60,6 +69,7 @@ func main() {
 	result := utils.Get(*key, v)
 
 	// if result is among any of the concrete types, print as is
+	// TODO: put into own function
 	switch t := result.(type) {
 	case float64, bool, string, nil:
 		fmt.Println(t)
@@ -67,7 +77,7 @@ func main() {
 		// format output for non concrete types
 		buffer := new(bytes.Buffer)
 		resultBytes, _ := json.Marshal(result)
-		json.Indent(buffer, resultBytes, "", "  ")
+		json.Indent(buffer, resultBytes, "", getIndentString(*indent, *indentStr))
 		fmt.Println(buffer.String())
 	}
 }
