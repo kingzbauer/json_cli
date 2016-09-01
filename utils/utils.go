@@ -8,17 +8,20 @@ import (
 )
 
 var (
-	FIELD_SEP string = "."
-	INDEX_REG        = regexp.MustCompile(`^\[\d+\]$`)
+	// FieldSep defines what is used to separate fields
+	FieldSep = "."
+	// IndexReg defines the regular expression that matches an array indexing field
+	IndexReg = regexp.MustCompile(`^\[\d+\]$`)
 )
 
+// Parse unmarshals a byte string to its respective Go data structure
 func Parse(data []byte) (v interface{}, err error) {
 	err = json.Unmarshal(data, &v)
 	return
 }
 
 func isIndex(v string) bool {
-	return INDEX_REG.Match([]byte(v))
+	return IndexReg.Match([]byte(v))
 }
 
 func retrieveValueFromIndex(v string) int {
@@ -45,8 +48,12 @@ func get(field string, v interface{}) interface{} {
 	return nil
 }
 
+// Get returns the value of a given key from the data present in v.
+// You can dig deep into the tree by separating field names with a period `.`
+// Indexing an array can be done via the normal indexing syntax e.g `[0]` so that a whole
+// key could be something like this: `key1.[0].key2`
 func Get(field string, v interface{}) interface{} {
-	fields := strings.Split(field, FIELD_SEP)
+	fields := strings.Split(field, FieldSep)
 	result := v
 
 	for _, fieldStr := range fields {
