@@ -2,8 +2,47 @@ package utils
 
 import (
 	"reflect"
+	"sort"
 	"testing"
 )
+
+var MapJson = `{
+        "Id": "d836a5e40aa8974d7076e791ba3c14726bf2dd2cd079652477d6827973969130",
+        "Created": "2016-08-31T16:49:33.119587574Z",
+        "Path": "/bin/bash",
+        "Args": [{"bool": true}],
+        "State": {
+            "Status": "running",
+            "Running": true,
+            "Paused": false
+        }
+     }`
+
+var ArrayJson = `{
+  [
+    {"Id": 23,
+     "State": {
+       "Status": "running",
+       "Running": true
+     }
+    },
+    {}
+  ]
+}`
+
+type sortableStrings []string
+
+func (s sortableStrings) Len() int {
+	return len(s)
+}
+
+func (s sortableStrings) Swap(i, j int) {
+	s[i], s[j] = s[j], s[i]
+}
+
+func (s sortableStrings) Less(i, j int) bool {
+	return s[i] < s[j]
+}
 
 func TestParse(t *testing.T) {
 	validJSON := `{
@@ -131,5 +170,38 @@ func TestCanIndexAnArray(t *testing.T) {
 	returnedV = Get(key, v)
 	if !reflect.DeepEqual(expectedV, returnedV) {
 		t.Errorf("Expected %v: Got %v", expectedV, returnedV)
+	}
+}
+
+func TestListKeys(t *testing.T) {
+	// add expected keys for the jsonMap
+	expectedKeys := sortableStrings([]string{"Id", "Created", "Path", "Args", "State"})
+	sort.Sort(expectedKeys)
+	parsedV, _ := Parse([]byte(MapJson))
+	returnedKeys := sortableStrings(ListKeys("", parsedV))
+	sort.Sort(returnedKeys)
+	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
+		t.Errorf("Expected %v. Returned %v", expectedKeys, returnedKeys)
+	}
+
+	// test for the array json
+	expectedKeys = sortableStrings([]string{"[0]", "[1]"})
+	sort.Sort(expectedKeys)
+	parsedV, _ = Parse([]byte(ArrayJson))
+	returnedKeys = sortableStrings(ListKeys("", parsedV))
+	sort.Sort(returnedKeys)
+	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
+		t.Errorf("Expected %v. Returned %v", expectedKeys, returnedKeys)
+	}
+
+	// try a nested key
+	expectedKeys = sortableStrings([]string{"Status", "Running", "Paused"})
+	sort.Sort(expectedKeys)
+	rootKey := "State"
+	parsedV, _ = Parse([]byte(MapJson))
+	returnedKeys = sortableStrings(ListKeys(rootKey, parsedV))
+	sort.Sort(returnedKeys)
+	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
+		t.Errorf("Expected %v. Returned %v", expectedKeys, returnedKeys)
 	}
 }
