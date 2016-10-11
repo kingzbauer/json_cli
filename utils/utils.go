@@ -2,6 +2,7 @@ package utils
 
 import (
 	"encoding/json"
+	"fmt"
 	"regexp"
 	"strconv"
 	"strings"
@@ -65,6 +66,40 @@ func Get(field string, v interface{}) interface{} {
 	return result
 }
 
+// ListKeys given a root key, returns all the to level keys under the root key if the
+// key exists
 func ListKeys(rootKey string, v interface{}) []string {
-	return nil
+	if len(rootKey) > 0 {
+		v = Get(rootKey, v)
+	}
+
+	switch t := v.(type) {
+	case []interface{}:
+		return arrayKeys(t)
+	case map[string]interface{}:
+		return mapKeys(t)
+	default:
+		return nil
+	}
+}
+
+func mapKeys(m map[string]interface{}) []string {
+	v := make([]string, len(m))
+	var index int
+	for key := range m {
+		v[index] = key
+		index++
+	}
+
+	return v
+
+}
+
+func arrayKeys(arr []interface{}) []string {
+	v := make([]string, len(arr))
+	for i := 0; i < len(arr); i++ {
+		v[i] = fmt.Sprintf("[%d]", i)
+	}
+
+	return v
 }

@@ -6,7 +6,7 @@ import (
 	"testing"
 )
 
-var MapJson = `{
+var MapJSON = `{
         "Id": "d836a5e40aa8974d7076e791ba3c14726bf2dd2cd079652477d6827973969130",
         "Created": "2016-08-31T16:49:33.119587574Z",
         "Path": "/bin/bash",
@@ -18,8 +18,7 @@ var MapJson = `{
         }
      }`
 
-var ArrayJson = `{
-  [
+var ArrayJSON = `[
     {"Id": 23,
      "State": {
        "Status": "running",
@@ -27,8 +26,7 @@ var ArrayJson = `{
      }
     },
     {}
-  ]
-}`
+  ]`
 
 type sortableStrings []string
 
@@ -177,7 +175,7 @@ func TestListKeys(t *testing.T) {
 	// add expected keys for the jsonMap
 	expectedKeys := sortableStrings([]string{"Id", "Created", "Path", "Args", "State"})
 	sort.Sort(expectedKeys)
-	parsedV, _ := Parse([]byte(MapJson))
+	parsedV, _ := Parse([]byte(MapJSON))
 	returnedKeys := sortableStrings(ListKeys("", parsedV))
 	sort.Sort(returnedKeys)
 	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
@@ -187,7 +185,7 @@ func TestListKeys(t *testing.T) {
 	// test for the array json
 	expectedKeys = sortableStrings([]string{"[0]", "[1]"})
 	sort.Sort(expectedKeys)
-	parsedV, _ = Parse([]byte(ArrayJson))
+	parsedV, _ = Parse([]byte(ArrayJSON))
 	returnedKeys = sortableStrings(ListKeys("", parsedV))
 	sort.Sort(returnedKeys)
 	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
@@ -198,7 +196,7 @@ func TestListKeys(t *testing.T) {
 	expectedKeys = sortableStrings([]string{"Status", "Running", "Paused"})
 	sort.Sort(expectedKeys)
 	rootKey := "State"
-	parsedV, _ = Parse([]byte(MapJson))
+	parsedV, _ = Parse([]byte(MapJSON))
 	returnedKeys = sortableStrings(ListKeys(rootKey, parsedV))
 	sort.Sort(returnedKeys)
 	if !reflect.DeepEqual(expectedKeys, returnedKeys) {
