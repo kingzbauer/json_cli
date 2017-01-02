@@ -13,11 +13,13 @@ import (
 )
 
 var (
-	key       = flag.String("k", "", "The key value for the field you want to access. Separate nested keys using `.`")
-	file      = flag.String("f", "", "Json file to search")
-	indent    = flag.Int("indent", 4, "Indent level for the json output")
-	indentStr = flag.String("indentStr", " ", "String used to indent")
-	listKeys  = flag.Bool("l", false, "List all keys under -k")
+	key         = flag.String("k", "", "The key value for the field you want to access. Separate nested keys using `.`")
+	file        = flag.String("f", "", "Json file to search")
+	indent      = flag.Int("indent", 4, "Indent level for the json output")
+	indentStr   = flag.String("indentStr", " ", "String used to indent")
+	listKeys    = flag.Bool("l", false, "List all keys under -k")
+	search      = flag.Bool("s", false, "Search for the key")
+	searchDepth = flag.Int("d", 3, "Search depth")
 )
 
 func main() {
@@ -25,6 +27,11 @@ func main() {
 	if len(*key) == 0 && !*listKeys {
 		fmt.Printf("Field `%s` is required\n", "-k")
 		flag.Usage()
+		os.Exit(1)
+	}
+
+	if *listKeys && *search {
+		fmt.Println("You can't provide both -s and -l")
 		os.Exit(1)
 	}
 
@@ -42,6 +49,9 @@ func main() {
 
 	if *listKeys {
 		listkeys(*key, v)
+	} else if *search {
+		result := jsongear.Search(*key, v, *searchDepth)
+		printJSON(result)
 	} else {
 		result := jsongear.Get(*key, v)
 		printJSON(result)
