@@ -203,3 +203,28 @@ func TestListKeys(t *testing.T) {
 		t.Errorf("Expected %v. Returned %v", expectedKeys, returnedKeys)
 	}
 }
+
+func TestSearchKey(t *testing.T) {
+	// Test a key search in an array
+	key := "bool"
+	expectedV := true
+	// a depth of 0 should miss the key
+	parsedV, _ := Parse([]byte(MapJSON))
+	receivedV := Search(key, parsedV, 0)
+	if reflect.DeepEqual(receivedV, expectedV) {
+		t.Errorf("Expected nil, got %#v", receivedV)
+	}
+
+	receivedV = Search(key, parsedV, 2)
+	if !reflect.DeepEqual(receivedV, expectedV) {
+		t.Errorf("Expected %#v, got %#v", expectedV, receivedV)
+	}
+
+	// Test a key search in a map
+	key = "Status"
+	statusV := "running"
+	receivedV = Search(key, parsedV, 1)
+	if !reflect.DeepEqual(statusV, receivedV) {
+		t.Errorf("Expected %#v, got %#v", statusV, receivedV)
+	}
+}

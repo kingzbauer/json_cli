@@ -103,3 +103,49 @@ func arrayKeys(arr []interface{}) []string {
 
 	return v
 }
+
+// Search searches for the value for `key` given the data structure upto to `depth` deep
+func Search(key string, data interface{}, depth int) interface{} {
+	return search(key, data, depth, 0)
+}
+
+func search(key string, data interface{}, depth, currentdepth int) interface{} {
+	if !isIterable(data) {
+		return nil
+	}
+
+	v := get(key, data)
+	if v != nil {
+		return v
+	}
+
+	if depth == currentdepth {
+		return nil
+	}
+
+	var keys []string
+	switch t := data.(type) {
+	case map[string]interface{}:
+		keys = mapKeys(t)
+	case []interface{}:
+		keys = arrayKeys(t)
+	}
+	for _, k := range keys {
+		v = search(key, get(k, data), depth, currentdepth+1)
+		if v != nil {
+			return v
+		}
+	}
+
+	return nil
+}
+
+func isIterable(v interface{}) bool {
+	switch t := v.(type) {
+	case []interface{}, map[string]interface{}:
+		_ = t
+		return true
+	default:
+		return false
+	}
+}
