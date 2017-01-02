@@ -9,7 +9,7 @@ import (
 	"os"
 	"strings"
 
-	"github.com/kingzbauer/json_cli/utils"
+	"github.com/kingzbauer/json_cli/jsongear"
 )
 
 var (
@@ -37,13 +37,13 @@ func main() {
 		os.Exit(0)
 	}
 
-	v, err := utils.Parse(content)
+	v, err := jsongear.Parse(content)
 	must(err)
 
 	if *listKeys {
 		listkeys(*key, v)
 	} else {
-		result := utils.Get(*key, v)
+		result := jsongear.Get(*key, v)
 		printJSON(result)
 	}
 }
@@ -88,7 +88,7 @@ func getIndentString(indentLevel int, indentStr string) string {
 }
 
 func listkeys(root string, content interface{}) {
-	keys := utils.ListKeys(root, content)
+	keys := jsongear.ListKeys(root, content)
 	if key == nil {
 		fmt.Println("No keys")
 		return
