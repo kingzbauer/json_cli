@@ -22,7 +22,7 @@ var (
 
 func main() {
 	flag.Parse()
-	if len(*key) == 0 {
+	if len(*key) == 0 && !*listKeys {
 		fmt.Printf("Field `%s` is required\n", "-k")
 		flag.Usage()
 		os.Exit(1)

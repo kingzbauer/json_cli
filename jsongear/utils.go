@@ -1,4 +1,4 @@
-package utils
+package jsongear
 
 import (
 	"encoding/json"
